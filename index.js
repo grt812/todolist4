@@ -8,10 +8,22 @@ $(function(){
     syncNotes(localStorage.getItem("notes").split(","));
   }
 
-  $(document).on("keypress", function(e){
+  $(document).on("keyup", function(e){
     if(e.keyCode === 13){
       newNote();
     }
+    // console.log("keypress");
+    // console.log("up: "+(e.keyCode === 38));
+    // if(e.keyCode === 38 && $(":focus").is(".note-input") && $(".note-input").prev().length){
+    //   console.log("up");
+    //   $(".note-input:focus").parent(".note").prev().find(".note-input").focus();
+    // } else {
+    //   console.log($(":focus").is(".note-input"));
+    // }
+    // if(e.keyCode === 40 && $(":focus").is(".note-input") && $(".note-input").next().length){
+    //   $(".note-input:focus").parent(".note").next().find(".note-input").focus();
+    //   console.log("down");
+    // }
   }).trigger("keypress");
   // }).on("mousemove", function(e){
   //   mouseX = e.pageX;
@@ -39,20 +51,16 @@ $(function(){
   if(document.hasFocus()){
     indicatorShowing = false;
     $("#focus-indicator").css("opacity","0");
-    console.log("automatic hide");
   } else {
     indicatorShowing = true;
     $("#focus-indicator").css("opacity","1");
     // $(window).trigger("blur");
-    console.log("automatic show");
   }
 
-  $(window).on("focus keydown click", function(){
-    console.log("bruh")
+  $(window).on("focus", function(){
     if(indicatorShowing){
       $("#focus-indicator").removeClass(["fade-in","fade-out"]).addClass("fade-out").off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd").one("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function(){
         $(this).removeClass(["fade-in","fade-out"]).css("opacity", 0).off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd");
-        console.log("hiding");
         indicatorShowing = false;
       });
     }
@@ -63,7 +71,6 @@ $(function(){
       $("#focus-indicator").show().removeClass(["fade-in","fade-out"]).addClass("fade-in").off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd").one("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function(){
         $(this).removeClass(["fade-in","fade-out"]).css("opacity", 1).off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd");
       });
-      console.log("showing");
       indicatorShowing = true;
     }
   });
@@ -97,8 +104,20 @@ $(function(){
 
   function onDelete(thisObject){
     let $this =  thisObject.target ? $(this) : thisObject;
-    console.log($this);
-    $this.parent(".note").prev().find(".note-input").focus();
+    if($this.parent(".note:not(.delete-animation)").prev().length){
+      // console.log("previous exists: "+$this.parent(".note").prev().is($this));
+      if(!thisObject.target){
+        setTimeout(function(){
+          $this.parent(".note").prev().find(".note-input").focus();
+        }, 0);
+      }
+    } else {
+      if(!thisObject.target){
+        setTimeout(function(){
+          $this.parent(".note").next().find(".note-input").focus();
+        }, 0);
+      }
+    }
     $this.parent(".note").addClass("delete-animation").one("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function(){
       $(this).off();
       $(this).remove();
@@ -107,34 +126,63 @@ $(function(){
     checkEmpty();
   }
 
-  function onKeyDelete(e){
-    let $this = $(this);
+  function onKeyDelete(e, thisObject){
+    let $this = thisObject;
     if(e.keyCode == 8 && !$this.val()){
       onDelete($this);
     }
   }
 
-  $("#new-note").click(newNote);
+  $("#new-note").on("click",newNote);
 
   function newNote(text="",animation=true){
     if(text.target){
       text="";
     }
-    $("#note-container").append(`
-      <div class="note new ${animation?"add-animation":""}">
-        <span class="material-icons drag">drag_indicator</span>
-        <input class="note-input" type="text" placeholder="Type something..." value="${text}">
-        <span class="material-icons delete">delete</span>
-      </div>
-    `)
-    $(".new").find(".delete").click(onDelete);
-    $(".new").find(".note-input").on("keydown", onKeyDelete).focus();
+    if(!$(":focus").is(".note-input")){
+      $("#note-container").append(`
+        <div class="note new ${animation?"add-animation":""}">
+          <span class="material-icons drag">drag_indicator</span>
+          <input class="note-input" type="text" placeholder="Type something..." value="${text}">
+          <span class="material-icons delete">delete</span>
+        </div>
+      `)
+    } else {
+      $(".note-input:focus").parent(".note").after(`
+        <div class="note new ${animation?"add-animation":""}">
+          <span class="material-icons drag">drag_indicator</span>
+          <input class="note-input" type="text" placeholder="Type something..." value="${text}">
+          <span class="material-icons delete">delete</span>
+        </div>
+      `)
+    }
+    $(".new").find(".delete").on("click",onDelete);
+    $(".new").find(".note-input").on("change keyup", function(e){
+      updateNotes();
+    }).on("keydown",function(e){
+      onKeyDelete(e, $(this));
+    }).on("keydown", function(e){
+      if(e.keyCode === 38){
+        let tempInput = $(this).parent(".note").prevAll(":not(.delete-animation)").first().find(".note-input");
+        let tempValue = tempInput.val();
+        tempInput.focus().val("");
+        setTimeout(function(){
+          tempInput.val(tempValue);
+        }, 0);
+      }else if(e.keyCode === 40){
+        let tempInput = $(this).parent(".note").nextAll(":not(.delete-animation)").first().find(".note-input");
+        tempInput.focus().val(tempInput.val());
+        // let tempValue = tempInput.val();
+        // tempInput.focus().val("");
+        // setTimeout(function(){
+        //   tempInput.val(tempValue);
+        // }, 0);
+      }
+    }).focus();
     $(".new").removeClass("new").on("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function(){
       $(this).removeClass("add-animation");
     }).click(function(){
       $(this).find(".note-input").focus().val($(this).find(".note-input").val());
-    }).on("change keypress", function(){
-      updateNotes();
     });
     checkEmpty(animation);
   }
@@ -161,7 +209,6 @@ $(function(){
     });
     globalData = data.toString();
     localStorage.setItem("notes", globalData)
-    console.log("Updated data: "+globalData);
   }
 
 });
