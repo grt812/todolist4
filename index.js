@@ -3,9 +3,14 @@ $(function(){
   let mouseY = 0;
   let titleDisplay = false;
   let globalData;
+  let darkMode = false;
 
   if(localStorage.getItem("notes")){
     syncNotes(localStorage.getItem("notes").split(","));
+  }
+
+  if(localStorage.getItem("darkMode")){
+      syncPreferences();
   }
 
   $(document).on("keyup", function(e){
@@ -187,6 +192,7 @@ $(function(){
     checkEmpty(animation);
   }
 
+
   function syncNotes(noteList){
     $("#note-container").empty();
     noteList.forEach(function(i){
@@ -194,9 +200,21 @@ $(function(){
     });
   }
 
+  function syncPreferences(){
+      console.log("Dark Mode: "+localStorage.getItem("darkMode"));
+      getDarkMode(localStorage.getItem("darkMode").trim() == "true");
+      darkMode = localStorage.getItem("darkMode").trim() == "true";
+      setTimeout(function(){
+        $("#loading-background").hide();
+    }, 20);
+  }
+
   window.addEventListener("storage", ()=>{
     if(globalData !== localStorage.getItem("notes")){
       syncNotes(localStorage.getItem("notes").split(","));
+    }
+    if(localStorage.getItem("darkMode")){
+      syncPreferences();
     }
   });
 
@@ -209,6 +227,29 @@ $(function(){
     });
     globalData = data.toString();
     localStorage.setItem("notes", globalData)
+  }
+
+  function updatePreferences(){
+
+  }
+
+  //Toggle Dark Theme
+  $("#dark-mode").on("click", function(){
+      $("#dark-css").remove();
+      if(!darkMode){
+          $("head").append(`<link id="dark-css" rel="stylesheet" href="dark.css">`);
+      }
+      darkMode = !darkMode;
+      localStorage.setItem("darkMode", darkMode);
+  });
+
+  function getDarkMode(isDarkMode){
+      $("#dark-css").remove();
+      if(isDarkMode){
+          $("head").append(`<link id="dark-css" rel="stylesheet" href="dark.css">`);
+      }
+      // darkMode = !isDarkMode;
+      // localStorage.setItem("darkMode", isDarkMode);
   }
 
 });

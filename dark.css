@@ -1,0 +1,7 @@
+:root{
+  --text-color: white;
+  --bg-color: rgb(50, 50, 50);
+  --fg-color: rgb(70, 70, 70);
+  --accent-color: rgb(70, 70, 70);
+  --default-shadow-color: rgb(30, 30, 30);
+}
