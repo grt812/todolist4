@@ -204,9 +204,7 @@ $(function(){
       console.log("Dark Mode: "+localStorage.getItem("darkMode"));
       getDarkMode(localStorage.getItem("darkMode").trim() == "true");
       darkMode = localStorage.getItem("darkMode").trim() == "true";
-      setTimeout(function(){
-        $("#loading-background").hide();
-    }, 20);
+      // setTimeout(function(){$("#loading-background").hide();}, 50);
   }
 
   window.addEventListener("storage", ()=>{
