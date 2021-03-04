@@ -6,11 +6,26 @@ $(function(){
   let darkMode = false;
 
   if(localStorage.getItem("notes")){
-    syncNotes(localStorage.getItem("notes").split(","));
+    try{
+        console.log(JSON.parse(localStorage.getItem("notes")));
+        syncNotes(localStorage.getItem("notes"));
+    } catch(e){
+        console.error(e.stack);
+        let tempNoteList  = localStorage.getItem("notes").split(",")
+        let tempObjectList = [];
+        tempNoteList.forEach(function(e, i){
+            tempObjectList.push({content:window.atob(tempNoteList[i]), completed: false});
+        });
+        syncNotes(JSON.stringify(tempObjectList));
+    }
   }
 
   if(localStorage.getItem("darkMode")){
       syncPreferences();
+  }
+
+  if(localStorage.getItem("completed")){
+      syncCompleted();
   }
 
   $(document).on("keyup", function(e){
@@ -52,33 +67,33 @@ $(function(){
   //   $("")
   // }
 
-  let indicatorShowing;
-  if(document.hasFocus()){
-    indicatorShowing = false;
-    $("#focus-indicator").css("opacity","0");
-  } else {
-    indicatorShowing = true;
-    $("#focus-indicator").css("opacity","1");
-    // $(window).trigger("blur");
-  }
-
-  $(window).on("focus", function(){
-    if(indicatorShowing){
-      $("#focus-indicator").removeClass(["fade-in","fade-out"]).addClass("fade-out").off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd").one("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function(){
-        $(this).removeClass(["fade-in","fade-out"]).css("opacity", 0).off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd");
-        indicatorShowing = false;
-      });
-    }
-  });
-
-  $(window).blur(function(){
-    if(!indicatorShowing){
-      $("#focus-indicator").show().removeClass(["fade-in","fade-out"]).addClass("fade-in").off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd").one("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function(){
-        $(this).removeClass(["fade-in","fade-out"]).css("opacity", 1).off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd");
-      });
-      indicatorShowing = true;
-    }
-  });
+  // let indicatorShowing;
+  // if(document.hasFocus()){
+  //   indicatorShowing = false;
+  //   $("#focus-indicator").css("opacity","0");
+  // } else {
+  //   indicatorShowing = true;
+  //   $("#focus-indicator").css("opacity","1");
+  //   // $(window).trigger("blur");
+  // }
+  //
+  // $(window).on("focus", function(){
+  //   if(indicatorShowing){
+  //     $("#focus-indicator").removeClass(["fade-in","fade-out"]).addClass("fade-out").off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd").one("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function(){
+  //       $(this).removeClass(["fade-in","fade-out"]).css("opacity", 0).off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd");
+  //       indicatorShowing = false;
+  //     });
+  //   }
+  // });
+  //
+  // $(window).blur(function(){
+  //   if(!indicatorShowing){
+  //     $("#focus-indicator").show().removeClass(["fade-in","fade-out"]).addClass("fade-in").off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd").one("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function(){
+  //       $(this).removeClass(["fade-in","fade-out"]).css("opacity", 1).off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd");
+  //     });
+  //     indicatorShowing = true;
+  //   }
+  // });
 
 
   checkEmpty(false);
@@ -140,14 +155,15 @@ $(function(){
 
   $("#new-note").on("click",newNote);
 
-  function newNote(text="",animation=true){
+  function newNote(text="", animation=true, completed=false){
     if(text.target){
       text="";
     }
     if(!$(":focus").is(".note-input")){
       $("#note-container").append(`
-        <div class="note new ${animation?"add-animation":""}">
+        <div class="note new ${animation?"add-animation"+(completed ? " completed":""):(completed ? "completed":"")}">
           <span class="material-icons drag">drag_indicator</span>
+          <span class="material-icons toggle-completion">${(completed ? "check_box":"check_box_outline_blank")}</span>
           <input class="note-input" type="text" placeholder="Type something..." value="${text}">
           <span class="material-icons delete">delete</span>
         </div>
@@ -156,12 +172,22 @@ $(function(){
       $(".note-input:focus").parent(".note").after(`
         <div class="note new ${animation?"add-animation":""}">
           <span class="material-icons drag">drag_indicator</span>
+          <span class="material-icons toggle-completion">check_box_outline_blank</span>
           <input class="note-input" type="text" placeholder="Type something..." value="${text}">
           <span class="material-icons delete">delete</span>
         </div>
       `)
     }
     $(".new").find(".delete").on("click",onDelete);
+    $(".new").find(".toggle-completion").on("click", function(){
+        $(this).parent(".note").toggleClass("completed");
+        if($(this).parent(".note").is(".completed")){
+            $(this).text("check_box");
+        } else {
+            $(this).text("check_box_outline_blank");
+        }
+        updateNotes();
+    });
     $(".new").find(".note-input").on("change keyup", function(e){
       updateNotes();
     }).on("keydown",function(e){
@@ -195,8 +221,12 @@ $(function(){
 
   function syncNotes(noteList){
     $("#note-container").empty();
-    noteList.forEach(function(i){
-      newNote(window.atob(i), false);
+    let tempList = JSON.parse(noteList);
+    tempList.forEach(function(e, i){
+        console.log("raw:");
+        console.log(e.completed);
+        console.log("evaluated: "+e.completed == "true");
+      newNote(e.content, false, e.completed);
     });
   }
 
@@ -206,6 +236,8 @@ $(function(){
       darkMode = localStorage.getItem("darkMode").trim() == "true";
       // setTimeout(function(){$("#loading-background").hide();}, 50);
   }
+
+  // function syncCompleted(){}
 
   window.addEventListener("storage", ()=>{
     if(globalData !== localStorage.getItem("notes")){
@@ -221,9 +253,9 @@ $(function(){
   function updateNotes(){
     let data = [];
     $("#note-container").find(".note").each(function(){
-      data.push(window.btoa($(this).find(".note-input").val()));
+      data.push({content:$(this).find(".note-input").val(), completed:$(this).hasClass("completed")});
     });
-    globalData = data.toString();
+    globalData = JSON.stringify(data);
     localStorage.setItem("notes", globalData)
   }
 

@@ -2,7 +2,9 @@
   --text-color: #444;
   --bg-color: rgb(248, 248, 248);
   --fg-color: white;
+  /* --accent-color: #FF4136; */
   --accent-color: white;
+  --accent-text-color: black;
   --default-shadow-color: rgba(220, 220, 220, 0.8);
 }
 
@@ -46,7 +48,7 @@ h1, h2, h3, h4, h5, h6{
 button{
     background-color: var(--accent-color);
     border: 0;
-    color: var(--text-color);
+    color: var(--accent-text-color);
 }
 
 #loading-background{
@@ -92,7 +94,7 @@ button{
   left: 50%;
   transform: translateX(-50%);
   padding: 10px;
-  background-color: var(--accent-color);
+  background-color: var(--fg-color);
   box-shadow: 2px 2px 5px 0px var(--default-shadow-color);
   border-radius: 50px;
   font-size: 16px;
@@ -125,6 +127,7 @@ button{
     /*Template Hover Code*/
     padding: 10px;
     background-color: var(--accent-color);
+    color: var(--accent-text-color);
     box-shadow: 2px 2px 5px 0px var(--default-shadow-color);
     border-radius: 50px;
     font-size: 15px;
@@ -192,6 +195,7 @@ button{
   display: inline-block;
   user-select: none;
   position: relative;
+  background-color: transparent;
   transition: transform 0.25s, border-radius 0.25s, box-shadow 0.25s, background 0.25s;
 }
 
@@ -211,6 +215,8 @@ button{
   cursor: pointer;
   box-shadow: 2px 2px 5px 0px var(--default-shadow-color);
   border-radius: 100px;
+  background-color: var(--accent-color);
+  color: var(--accent-text-color);
   border-bottom-width: 0;
   transform: scale(1.05);
 }
@@ -282,7 +288,7 @@ button{
   width: 100%;
   outline: 0;
   cursor: pointer;
-  background-color: var(--accent-color);
+  background-color: var(--fg-color);
   margin-bottom: 10px;
   padding: 16px;
   border: 0;
@@ -291,7 +297,7 @@ button{
   /* box-shadow: 2px 2px 5px 0px rgba(220, 220, 220, 0.5); */
   box-shadow: 2px 2px 5px 0 var(--default-shadow-color);
   box-sizing: border-box;
-  transition: box-shadow 0.25s, transform 0.25s;
+  transition: box-shadow 0.25s, transform 0.25s, opacity 0.25s;
 }
 
 /* .note:last-child{
@@ -337,6 +343,22 @@ button{
   position: relative;
   top: 3px;
   user-select: none;
+}
+
+.note.completed{
+    opacity: 0.5;
+}
+
+.note.completed:hover{
+    opacity: 0.8;
+}
+
+.note.completed:active{
+    opacity: 1;
+}
+
+.note.completed .note-input{
+    text-decoration: line-through;
 }
 
 span.drag{

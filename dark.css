@@ -2,6 +2,8 @@
   --text-color: white;
   --bg-color: rgb(50, 50, 50);
   --fg-color: rgb(70, 70, 70);
+  /* --accent-color: #FF4136; */
   --accent-color: rgb(70, 70, 70);
+  --accent-text-color: white;
   --default-shadow-color: rgb(30, 30, 30);
 }
