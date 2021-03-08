@@ -172,9 +172,9 @@ $(function(){
       `)
     } else {
       $(".note-input:focus").parent(".note").after(`
-        <div class="note new ${animation?"add-animation":""}">
+        <div class="note new ${animation?"add-animation"+(completed ? " completed":""):(completed ? "completed":"")}">
           <span class="material-icons drag">drag_indicator</span>
-          <span class="material-icons toggle-completion">check_box_outline_blank</span>
+          <span class="material-icons toggle-completion">${(completed ? "check_box":"check_box_outline_blank")}</span>
           <input class="note-input" type="text" placeholder="Type something..." value="${text}">
           <span class="material-icons delete">delete</span>
           <span class="material-icons">more_vert</span>
