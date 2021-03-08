@@ -5,6 +5,7 @@ $(function(){
   let globalData;
   let darkMode = false;
 
+  //Load saved data
   if(localStorage.getItem("notes")){
     try{
         console.log(JSON.parse(localStorage.getItem("notes")));
@@ -166,6 +167,7 @@ $(function(){
           <span class="material-icons toggle-completion">${(completed ? "check_box":"check_box_outline_blank")}</span>
           <input class="note-input" type="text" placeholder="Type something..." value="${text}">
           <span class="material-icons delete">delete</span>
+          <span class="material-icons">more_vert</span>
         </div>
       `)
     } else {
@@ -175,6 +177,7 @@ $(function(){
           <span class="material-icons toggle-completion">check_box_outline_blank</span>
           <input class="note-input" type="text" placeholder="Type something..." value="${text}">
           <span class="material-icons delete">delete</span>
+          <span class="material-icons">more_vert</span>
         </div>
       `)
     }

@@ -4,7 +4,7 @@
   --fg-color: white;
   /* --accent-color: #FF4136; */
   --accent-color: white;
-  --accent-text-color: black;
+  --accent-text-color: #444;
   --default-shadow-color: rgba(220, 220, 220, 0.8);
 }
 
@@ -307,11 +307,11 @@ button{
 .note:hover{
   /* box-shadow: 2px 2px 10px 0px rgba(220, 220, 220, 0.75); */
   box-shadow: 2px 2px 5px 0 var(--default-shadow-color);
-  transform: scale(1.01);
+  transform: scale(1.005);
 }
 
 .note:active{
-  transform: scale(1.005) !important;
+  transform: scale(1.0025) !important;
 }
 
 .note-input::placeholder{
@@ -343,6 +343,15 @@ button{
   position: relative;
   top: 3px;
   user-select: none;
+  transition: transform 0.1s;
+}
+
+.note span.material-icons:hover{
+    transform: scale(1.2);
+}
+
+.note span.material-icons:active{
+    transform: scale(1.00);
 }
 
 .note.completed{
