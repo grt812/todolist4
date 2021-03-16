@@ -206,11 +206,13 @@ button{
 
 #menu button.dropdown-button:hover{
     border-radius: 5px;
-    max-height: 200px;
+    max-height: 300px;
 }
 
 #menu button .dropdown .option{
     padding: 5px;
+    overflow:hidden;
+    width: 100px;
     background-color: var(--fg-color);
     transition: filter 0.25s;
 }
@@ -532,6 +534,10 @@ span.delete{
   }
 }
 
+#mobile{
+    display: none;
+}
+
 @media only screen and (max-width: 500px) {
   #inner, #new-item-button{
       width: 95vw !important;
@@ -544,6 +550,28 @@ span.delete{
   .note-input{
       font-size: 15px !important;
   }
+  #menu{
+      flex-direction: row;
+      align-items: flex-start;
+  }
+  #inner-overlay{
+      width: 100%;
+      /* height: 100%; */
+  }
+  #mobile{
+      display: block;
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+      height: 0;
+      width: 0;
+  }
+  /* #outer{
+      height: 100%;
+  }
+  #inner{
+      max-height: 100%;
+  } */
 }
 
 

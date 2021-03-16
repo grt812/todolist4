@@ -233,7 +233,7 @@ $(function(){
       if(!titleDisplay){
           $("#new-item-button").stop().show(500);
       }
-      if(animation){
+      if(animation && $("#mobile").is(":hidden")){
           window.scrollTo(0,document.body.scrollHeight);
       }
     }).click(function(){
@@ -241,6 +241,15 @@ $(function(){
     });
     checkEmpty(animation);
   }
+
+  //iPhone Resize Content when Keyboard is open
+  window.visualViewport.addEventListener("resize", function(){
+      if(window.visualViewport.height !== $(window).height()){
+          // setTimeout(function(){alert("Visual Viewport Height: "+window.visualViewport.height)}, 1000);
+          $("html, body, #inner, #outer").css("height", window.visualViewport.height+"px !important");
+          $("html, body, #inner, #outer").css("max-height", window.visualViewport.height+"px !important");
+      }
+  });
 
 
   function syncNotes(noteList){

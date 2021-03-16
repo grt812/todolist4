@@ -11,6 +11,7 @@
   <!--jQuery UI-->
   <link rel="stylesheet" type="text/css" href="jquery_ui/jquery-ui.min.css">
   <script type="text/javascript" src="jquery_ui/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="jquery.ui.touch-punch.min.js"></script>
   <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
   <script type="text/javascript" src="index.js"></script>
   <title>To-Do List 4</title>
@@ -21,15 +22,22 @@
   <!-- <div id="focus-indicator">Click anywhere or Press Tab to Focus</div> -->
   <div id="menu">
       <!-- <button class="ui-component small" data-popup="Donate"><span class="material-icons">favorite</span></button> -->
+      <button id="account-button" class="ui-component small dropdown-button"><div class="dropdown-title"><span class="material-icons">save</span><span class="text">Sync</span></div><div class="dropdown"><div class="option"><span class="material-icons">add_to_drive</span> Login</div><div class="option"><span class="material-icons">file_upload</span> Import</div><div class="option"><span class="material-icons">file_download</span> Export</div></div>
+      </button>
       <button id="settings-button" class="ui-component small" data-popup="Settings"><span class="material-icons">settings</span><span class="text">Settings</span></button>
+      <button id="" class="ui-component small" data-popup="Settings"><span class="material-icons">help</span><span class="text">Help</span></button>
       <button id="dark-mode" class="ui-component small dropdown-button"><div class="dropdown-title" data-popup="Theme"><span class="material-icons">colorize</span><span class="text">Theme</span></div>
           <div class="dropdown">
               <div id="light-theme-button" class="option">Light</div>
               <div id="dark-theme-button" class="option">Dark</div>
+              <div id="" class="option">Aqua</div>
+              <div id="" class="option">Sunset</div>
               <div id="default-theme-button" class="option">Default</div>
-              <div id="default-theme-button" class="option">Custom</div>
+              <div id="" class="option">Custom</div>
           </div>
       </button>
+      <button id="" class="ui-component small"><span class="material-icons">undo</span><span class="text">Undo</span></button>
+      <button id="" class="ui-component small"><span class="material-icons">redo</span><span class="text">Redo</span></button>
   </div>
   <div id="title-overlay">
     <div id="inner-overlay">
@@ -116,5 +124,6 @@
     </div>
   </div>
   <div id="new-item-button" class="ui-component">New Item+</div>
+  <div id="mobile"></div>
 </body>
 </html>
