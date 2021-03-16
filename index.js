@@ -21,14 +21,18 @@ $(function(){
     }
   }
 
+  //Sync Prefernces
   if(localStorage.getItem("darkMode")){
       syncPreferences();
   }
 
+
+  //Sync completed items
   if(localStorage.getItem("completed")){
       syncCompleted();
   }
 
+  //Create new note on enter key press
   $(document).on("keyup", function(e){
     if(e.keyCode === 13){
       newNote();
@@ -104,7 +108,10 @@ $(function(){
       $("#title-overlay").show().removeClass([".overlay-in","overlay-out"]).off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd");
       if(animation){
         $("#title-overlay").addClass("overlay-in");
-      }
+        $("#new-item-button").stop().hide(500);
+    } else {
+        $("#new-item-button").stop().hide();
+    }
       titleDisplay = true;
     } else if($("#note-container").children(".note:not(.delete-animation)").length && titleDisplay){
       $("#title-overlay").removeClass([".overlay-in","overlay-out"])
@@ -112,7 +119,9 @@ $(function(){
         $("#title-overlay").addClass("overlay-out").one("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function(){
           $(this).hide();
         });
+        $("#new-item-button").stop().show(500);
       } else {
+        $("#new-item-button").stop().show();
         $("#title-overlay").hide();
       }
       titleDisplay = false;
@@ -154,18 +163,24 @@ $(function(){
     }
   }
 
-  $("#new-note").on("click",newNote);
+  $("#new-note").on("click", newNote);
+  $("#new-item-button").on("click", function(){
+      newNote();
+  });
 
   function newNote(text="", animation=true, completed=false){
     if(text.target){
       text="";
+    }
+    if(animation && $("#note-container").outerHeight() > $(window).height() - 130){
+        $("#new-item-button").stop().hide(500);
     }
     if(!$(":focus").is(".note-input")){
       $("#note-container").append(`
         <div class="note new ${animation?"add-animation"+(completed ? " completed":""):(completed ? "completed":"")}">
           <span class="material-icons drag">drag_indicator</span>
           <span class="material-icons toggle-completion">${(completed ? "check_box":"check_box_outline_blank")}</span>
-          <input class="note-input" type="text" placeholder="Type something..." value="${text}">
+          <input class="note-input" type="text" placeholder="Type something..." value="${text}" size="1">
           <span class="material-icons delete">delete</span>
           <span class="material-icons">more_vert</span>
         </div>
@@ -175,7 +190,7 @@ $(function(){
         <div class="note new ${animation?"add-animation"+(completed ? " completed":""):(completed ? "completed":"")}">
           <span class="material-icons drag">drag_indicator</span>
           <span class="material-icons toggle-completion">${(completed ? "check_box":"check_box_outline_blank")}</span>
-          <input class="note-input" type="text" placeholder="Type something..." value="${text}">
+          <input class="note-input" type="text" placeholder="Type something..." value="${text}" size="1">
           <span class="material-icons delete">delete</span>
           <span class="material-icons">more_vert</span>
         </div>
@@ -215,6 +230,12 @@ $(function(){
     }).focus();
     $(".new").removeClass("new").on("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function(){
       $(this).removeClass("add-animation");
+      if(!titleDisplay){
+          $("#new-item-button").stop().show(500);
+      }
+      if(animation){
+          window.scrollTo(0,document.body.scrollHeight);
+      }
     }).click(function(){
       $(this).find(".note-input").focus().val($(this).find(".note-input").val());
     });
@@ -266,15 +287,46 @@ $(function(){
 
   }
 
-  //Toggle Dark Theme
-  $("#dark-mode").on("click", function(){
+
+  function addTheme(themeName){
+
+  }
+
+  function removeTheme(themeName){
+
+  }
+
+  //Toggle Dark/Light Theme
+  $("#dark-theme-button").on("click", function(){
       $("#dark-css").remove();
-      if(!darkMode){
-          $("head").append(`<link id="dark-css" rel="stylesheet" href="dark.css">`);
-      }
-      darkMode = !darkMode;
+      $("head").append(`<link id="dark-css" rel="stylesheet" href="dark.css">`);
+      darkMode = true;
       localStorage.setItem("darkMode", darkMode);
   });
+
+  $("#light-theme-button").on("click", function(){
+      $("#dark-css").remove();
+      darkMode = false;
+      localStorage.setItem("darkMode", darkMode);
+  });
+
+//Thanks to Mark Szabo from https://stackoverflow.com/questions/56393880/how-do-i-detect-dark-mode-using-javascript
+$("#default-theme-button").on("click", function(){
+    if(window.matchMedia){
+        if(window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            $("#dark-css").remove();
+            $("head").append(`<link id="dark-css" rel="stylesheet" href="dark.css">`);
+            darkMode = true;
+            localStorage.setItem("darkMode", darkMode);
+        } else if(window.matchMedia('(prefers-color-scheme: light)').matches){
+            $("#dark-css").remove();
+            darkMode = false;
+            localStorage.setItem("darkMode", darkMode);
+        }
+    } else {
+        alert("Lol what type of browser are you using? Get Chrome here: https://www.google.com/chrome/ or Firefox here: https://www.mozilla.org/en-US/firefox/new/ ")
+    }
+});
 
   function getDarkMode(isDarkMode){
       $("#dark-css").remove();
@@ -284,5 +336,41 @@ $(function(){
       // darkMode = !isDarkMode;
       // localStorage.setItem("darkMode", isDarkMode);
   }
+
+  $(".modal").hide();
+
+  //Settings
+  $("#settings-button").click(function(){
+      showModal("#settings");
+  });
+
+  function showModal(selector){
+      // $(selector).one("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function(){
+      //     selector.removeClass("showAnimation").off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd");
+      // });
+      $(selector).addClass("showAnimation").removeClass("hideAnimation").show();
+      $(selector).find(".inner").addClass("showAnimation").removeClass("hideAnimation").show();
+  }
+
+  //animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd
+  $(".close-modal").click(function(){
+      $(this).parents(".modal").one("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function(){
+          $(this).removeClass("showAnimation").removeClass("hideAnimation").hide().off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd");
+      });
+      // $(this).parents(".inner").one("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function(){
+      //     $(this).removeClass("showAnimation").removeClass("hideAnimation").hide().off("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd");
+      // });
+      $(this).parents(".modal").removeClass("showAnimation").show().addClass("hideAnimation");
+      // $(this).parents(".inner").addClass("hideAnimation").removeClass("showAnimation");
+
+  });
+
+  $("#delete-all-items").click(function(){
+      if(confirm("Are you sure you want to delete all items?")){
+          $("#note-container").empty();
+          updateNotes();
+          checkEmpty(true);
+      }
+  });
 
 });

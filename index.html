@@ -11,6 +11,7 @@
   <!--jQuery UI-->
   <link rel="stylesheet" type="text/css" href="jquery_ui/jquery-ui.min.css">
   <script type="text/javascript" src="jquery_ui/jquery-ui.min.js"></script>
+  <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.js"></script>
   <script type="text/javascript" src="index.js"></script>
   <title>To-Do List 4</title>
 </head>
@@ -19,8 +20,16 @@
   <canvas id="background"></canvas>
   <!-- <div id="focus-indicator">Click anywhere or Press Tab to Focus</div> -->
   <div id="menu">
-      <button id="dark-mode" class="ui-component"><span class="material-icons">mode_night</span></button>
-      <button class="ui-component"><span class="material-icons">settings</span></button>
+      <!-- <button class="ui-component small" data-popup="Donate"><span class="material-icons">favorite</span></button> -->
+      <button id="settings-button" class="ui-component small" data-popup="Settings"><span class="material-icons">settings</span><span class="text">Settings</span></button>
+      <button id="dark-mode" class="ui-component small dropdown-button"><div class="dropdown-title" data-popup="Theme"><span class="material-icons">colorize</span><span class="text">Theme</span></div>
+          <div class="dropdown">
+              <div id="light-theme-button" class="option">Light</div>
+              <div id="dark-theme-button" class="option">Dark</div>
+              <div id="default-theme-button" class="option">Default</div>
+              <div id="default-theme-button" class="option">Custom</div>
+          </div>
+      </button>
   </div>
   <div id="title-overlay">
     <div id="inner-overlay">
@@ -28,11 +37,84 @@
       <h2 id="subtitle">Press [Enter] for <span id="new-note" class="link-button">new item</span></h2>
     </div>
   </div>
+  <div class="modal" id="settings">
+      <div class="inner">
+          <button class="close-modal ui-component small">
+              <span class="material-icons">close</span>
+          </button>
+          <h1 id="settings-title">Settings</h1>
+          <h2>Styling</h2>
+          <h3><label>Custom Theme<input type="checkbox"></label></h3>
+          <div>
+              <div class="option-container">
+                  Templates:
+                  <button class="option ui-component">Light</button>
+                  <button class="option ui-component">Dark</button>
+                  <button class="option ui-component">Aqua</button>
+                  <button class="option ui-component">Sunset</button>
+              </div>
+          </div>
+          <label class="ui-component">
+              <span class="text">Background Color</span>
+              <input type="color">
+          </label>
+          <label class="ui-component">
+              <span class="text">Foreground Color</span>
+              <input type="color">
+          </label>
+          <label class="ui-component">
+              <span class="text">Accent Color</span>
+              <input type="color">
+          </label>
+          <label class="ui-component">
+              <span class="text">Input Accent Color</span>
+              <input type="color">
+          </label>
+          <label class="ui-component">
+              <span class="text">Scrollbar Color</span>
+              <input type="color">
+          </label>
+          <label class="ui-component">
+              <span class="text">Scrolltrack Color</span>
+              <input type="color">
+          </label>
+          <label class="ui-component">
+              <span class="text">Default Shadow Color</span>
+              <input type="color">
+          </label>
+          <label class="ui-component"><span class="text">Rounded Corners</span> <input type="checkbox"></label>
+          <h3><label>Custom Background Image<input type="checkbox"></label></h3>
+          <label class="file">
+              Drag/Upload Image Here
+              <input type="file" accept="image/*">
+          </label>
+          <label>Opacity: 0</label>
+          <input type="range">
+          <label>Blur: 0</label>
+          <input type="range">
+          <h2>Storage
+              <label class="file">
+                  Import <span class="material-icons">file_upload</span>
+                  <input type="file">
+              </label>
+              <button class="input">Export <span class="material-icons">file_download</span></button>
+          </h2>
+          <label>Sync to Google Drive <input type="checkbox" disabled></label>
+          <label>Automatically sync with chrome extension <input type="checkbox" disabled></label>
+          <button class="input" id="delete-all-items">Delete All Items</button>
+          <div class="save-menu">
+              <i>Auto Saved </i>&nbsp;
+              <button class="input">Revert</button>
+          </div>
+          <br>
+      </div>
+  </div>
   <div id="outer">
     <div id="inner">
       <!-- <h1>Notes</h1> -->
       <div id="note-container"></div>
     </div>
   </div>
+  <div id="new-item-button" class="ui-component">New Item+</div>
 </body>
 </html>
