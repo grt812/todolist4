@@ -1,14 +1,14 @@
 :root{
-  --text-color: #444;
-  --bg-color: rgb(248, 248, 248);
-  --fg-color: white;
+  --text-color: #444444;
+  --bg-color: #f8f8f8;
+  --fg-color: #ffffff;
   /* --accent-color: #FF4136; */
-  --accent-color: white;
+  --accent-color: #ffffff;
   --accent-input-color: #0074D9;
-  --accent-text-color: #444;
-  --accent-input-text-color: white;
-  --scrollbar: rgb(150, 150, 150);
-  --scrolltrack: rgb(200, 200, 200);
+  --accent-text-color: #444444;
+  --accent-input-text-color: #ffffff;
+  --scrollbar: #969696;
+  --scrolltrack: #C8C8C8;
   --default-shadow-color: rgba(220, 220, 220, 0.8);
   --default-light-shadow-color: rgba(220, 220, 220, 0.5);
 }
@@ -21,13 +21,13 @@
 /* width */
 ::-webkit-scrollbar {
   width: 10px;
-  border-radius: 10px;
+  /* border-radius: 10px; */
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
   background: var(--scrolltrack);
-  border-radius: 10px;
+  /* border-radius: 10px; */
 }
 
 /* Handle */
@@ -50,8 +50,14 @@ html, body{
   height: 100%;
   margin: 0;
   color: var(--text-color);
-  background-color: var(--bg-color);
+  /* background-color: var(--bg-color); */
+  background-color: transparent;
   scroll-behavior: smooth;
+  z-index: -1;
+}
+
+body{
+    background-color: var(--bg-color) !important;
 }
 
 h1, h2, h3, h4, h5, h6{
@@ -213,7 +219,7 @@ button{
     padding: 5px;
     overflow:hidden;
     width: 100px;
-    background-color: var(--fg-color);
+    background-color: var(--accent-color);
     transition: filter 0.25s;
 }
 
@@ -354,6 +360,13 @@ button{
   animation: overlay-out 1s ease-in-out 0s 1;
 }
 
+#background{
+    background-color: var(--bg-color);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+}
+
 #outer{
   position: relative;
   height: 100vh;
@@ -389,7 +402,7 @@ button{
   /* box-shadow: 2px 2px 5px 0px rgba(220, 220, 220, 0.5); */
   box-shadow: 2px 2px 5px 0 var(--default-shadow-color);
   box-sizing: border-box;
-  transition: box-shadow 0.25s, transform 0.25s, opacity 0.25s;
+  transition: box-shadow 0.25s, transform 0.25s, opacity 0.25s, background 0.25s;
 }
 
 /* .note:last-child{
@@ -409,6 +422,10 @@ button{
 .note-input::placeholder{
   font-style: italic;
   color: var(--text-color);
+}
+
+.note.starred .note-input::placeholder{
+    color: var(--accent-input-text-color);
 }
 
 .note:focus{
@@ -464,6 +481,14 @@ button{
 
 .note > *{
     vertical-align: middle;
+}
+
+.note.starred{
+    background-color: var(--accent-input-color);
+}
+
+.note.starred > *{
+    color: var(--accent-input-text-color) !important;
 }
 
 span.drag{
@@ -728,6 +753,11 @@ input[type="color"]{
   outline: 0;
   position: relative;
   transition: transform 0.25s;
+  box-sizing: border-box;
+  padding: 2px;
+  background-color: #20bf55;
+  background-image: linear-gradient(315deg, #20bf55 0%, #01baef 74%);
+
 }
 
 input[type="color"]:hover{
@@ -766,6 +796,8 @@ input[type="checkbox"]{
   position: relative;
   cursor: pointer;
   vertical-align: middle;
+  background-color: transparent;
+  color: transparent;
 }
 
 /*Knob*/
@@ -785,7 +817,7 @@ input[type="checkbox"]::after{
 }
 
 input[type="checkbox"]:checked::before{
-  background-color: #0074D9;
+  background-color: var(--accent-input-color);
 }
 
 input[type="checkbox"]:checked::after{
@@ -851,11 +883,50 @@ button.input:active, label.file:active{
 }
 
 input[type="range"]{
+    outline: 0;
     cursor: grab;
+    -webkit-appearance: none;
+    /* appearance: none; */
+    background-color: var(--bg-color);
+    height: 20px;
+    border-radius: 15px;
+    width: 100%;
+    margin: 0 10px !important;
+}
+
+input[type="range"]::before{
+    content: attr("value");
 }
 
 input[type="range"]:active{
     cursor: grabbing;
+}
+
+::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 25px;
+    box-shadow: var(--default-light-shadow-color);
+    background: var(--accent-input-color);
+}
+
+::-webkit-slider-thumb:hover{
+    transform: scale(1.1);
+    background: var(--accent-input-color);
+}
+
+::-webkit-slider-thumb:active{
+    transform: scale(1.05);
+    background: var(--accent-input-color);
+}
+
+::-moz-range-thumb{
+    width: 50px !important;
+    height: 50px !important;
+    box-shadow: var(--default-light-shadow-color);
+    background: var(--accent-input-color);
 }
 /*
 input[type="color"]{

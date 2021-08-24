@@ -1,0 +1,13 @@
+:root{
+  --text-color: #ffffff;
+  --bg-color: #f42b03;
+  --fg-color: #ec7505;
+  /* --accent-color: #FF4136; */
+  --accent-color: #e89005;
+  --accent-input-color: #e89005;
+  --accent-text-color: #ffffff;
+  --scrollbar: #f42b03;
+  --scrolltrack: #ec7505;
+  --default-shadow-color: transparent;
+  --default-light-shadow-color: transparent;
+}

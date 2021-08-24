@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+  <style id="bg-img-style"></style>
   <script src="jquery-3.5.1.min.js"></script>
   <!--jQuery UI-->
   <link rel="stylesheet" type="text/css" href="jquery_ui/jquery-ui.min.css">
@@ -18,7 +19,7 @@
 </head>
 <body>
   <!-- <div id="loading-background"></div> -->
-  <canvas id="background"></canvas>
+  <div id="background"></div>
   <!-- <div id="focus-indicator">Click anywhere or Press Tab to Focus</div> -->
   <div id="menu">
       <!-- <button class="ui-component small" data-popup="Donate"><span class="material-icons">favorite</span></button> -->
@@ -30,10 +31,10 @@
           <div class="dropdown">
               <div id="light-theme-button" class="option">Light</div>
               <div id="dark-theme-button" class="option">Dark</div>
-              <div id="" class="option">Aqua</div>
-              <div id="" class="option">Sunset</div>
+              <div id="aqua-theme-button" class="option">Aqua</div>
+              <div id="sunset-theme-button" class="option">Warm</div>
               <div id="default-theme-button" class="option">Default</div>
-              <div id="" class="option">Custom</div>
+              <div id="custom-theme-button" class="option">Custom</div>
           </div>
       </button>
       <button id="" class="ui-component small"><span class="material-icons">undo</span><span class="text">Undo</span></button>
@@ -52,54 +53,68 @@
           </button>
           <h1 id="settings-title">Settings</h1>
           <h2>Styling</h2>
-          <h3><label>Custom Theme<input type="checkbox"></label></h3>
+          <h3>Custom Theme <button class="input" id="custom-theme-toggle">Apply Theme</button></h3>
           <div>
               <div class="option-container">
                   Templates:
-                  <button class="option ui-component">Light</button>
-                  <button class="option ui-component">Dark</button>
-                  <button class="option ui-component">Aqua</button>
-                  <button class="option ui-component">Sunset</button>
+                  <button id="light-template" class="option ui-component">Light</button>
+                  <button id="dark-template" class="option ui-component">Dark</button>
+                  <button id="aqua-template" class="option ui-component">Aqua</button>
+                  <button id="sunset-template" class="option ui-component">Warm</button>
               </div>
           </div>
           <label class="ui-component">
+              <span class="text">Text Color</span>
+              <input id="text-color-input" type="color">
+          </label>
+          <label class="ui-component">
               <span class="text">Background Color</span>
-              <input type="color">
+              <input id="bg-color-input" type="color">
           </label>
           <label class="ui-component">
               <span class="text">Foreground Color</span>
-              <input type="color">
+              <input id="fg-color-input" type="color">
           </label>
           <label class="ui-component">
               <span class="text">Accent Color</span>
-              <input type="color">
+              <input id="accent-color-input" type="color">
           </label>
           <label class="ui-component">
               <span class="text">Input Accent Color</span>
-              <input type="color">
+              <input id="input-accent-color-input" type="color">
+          </label>
+          <label class="ui-component">
+              <span class="text">Accent Text Color</span>
+              <input id="accent-text-color-input" type="color">
+          </label>
+          <label class="ui-component">
+              <span class="text">Input Accent Text Color</span>
+              <input id="input-accent-text-color-input" type="color">
           </label>
           <label class="ui-component">
               <span class="text">Scrollbar Color</span>
-              <input type="color">
+              <input id="scrollbar-input" type="color">
           </label>
           <label class="ui-component">
               <span class="text">Scrolltrack Color</span>
-              <input type="color">
+              <input id="scrolltrack-input" type="color">
           </label>
           <label class="ui-component">
               <span class="text">Default Shadow Color</span>
-              <input type="color">
+              <input id="shadow-input" type="color">
           </label>
-          <label class="ui-component"><span class="text">Rounded Corners</span> <input type="checkbox"></label>
-          <h3><label>Custom Background Image<input type="checkbox"></label></h3>
+          <label class="ui-component"><span class="text">Toggle Shadows</span> <input type="checkbox" id="toggle-shadow"></label>
+          <h3>Custom Background Image <button class="input" id="remove-bg-img">Remove</button></h3>
           <label class="file">
               Drag/Upload Image Here
-              <input type="file" accept="image/*">
+              <input type="file" id="background-img-input" accept="image/*">
           </label>
-          <label>Opacity: 0</label>
-          <input type="range">
-          <label>Blur: 0</label>
-          <input type="range">
+          <label class="ui-component"><span class="text">Opacity</span><input id="opacity-input" type="range" min="0.05" max="1" step="0.05"></label>
+          <label class="ui-component"><span class="text">Blur</span><input id="blur-input" type="range" min="0" max="20" step="1"></label>
+<!--
+          <label>Blur</label>
+          <input type="range" min="0" max="1" step="0.05"> -->
+          <h2><label>Notifications <input type="checkbox" disabled></label></h2>
           <h2>Storage
               <label class="file">
                   Import <span class="material-icons">file_upload</span>

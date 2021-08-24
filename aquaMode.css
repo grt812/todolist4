@@ -1,0 +1,20 @@
+:root{
+  --text-color: #ffffff;
+  /*Blue*/
+  --bg-color: #0074D9;
+  /*Light Blue*/
+  --fg-color: #39CCCC;
+  /* --accent-color: #FF4136; */
+  /*Teal*/
+  --accent-color: #7FDBFF;
+  /*Blue*/
+  --accent-input-color: #0074D9;
+  --accent-text-color: #ffffff;
+  /*Light Blue*/
+  --scrollbar: #7FDBFF;
+  /*Blue*/
+  --scrolltrack: #0074D9;
+  /*Dark Blue*/
+  --default-shadow-color: transparent;
+  --default-light-shadow-color: transparent;
+}

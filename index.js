@@ -1,9 +1,18 @@
 $(function(){
+  const LIGHT_MODE = "lightMode";
+  const DARK_MODE = "darkMode";
+  const AQUA_MODE = "aquaMode";
+  const SUNSET_MODE = "sunsetMode";
+  const DEFAULT_MODE = "defaultMode";
+  const CUSTOM_MODE = "customMode";
+
   let mouseX = 0;
   let mouseY = 0;
   let titleDisplay = false;
   let globalData;
   let darkMode = false;
+  let theme = "";
+  let customModeEnabled = false;
 
   //Load saved data
   if(localStorage.getItem("notes")){
@@ -22,9 +31,7 @@ $(function(){
   }
 
   //Sync Prefernces
-  if(localStorage.getItem("darkMode")){
-      syncPreferences();
-  }
+  syncPreferences();
 
 
   //Sync completed items
@@ -168,7 +175,7 @@ $(function(){
       newNote();
   });
 
-  function newNote(text="", animation=true, completed=false){
+  function newNote(text="", animation=true, completed=false, starred = false){
     if(text.target){
       text="";
     }
@@ -177,20 +184,22 @@ $(function(){
     }
     if(!$(":focus").is(".note-input")){
       $("#note-container").append(`
-        <div class="note new ${animation?"add-animation"+(completed ? " completed":""):(completed ? "completed":"")}">
+        <div class="note new ${starred?"starred":""} ${animation?"add-animation"+(completed ? " completed":""):(completed ? "completed":"")}">
           <span class="material-icons drag">drag_indicator</span>
           <span class="material-icons toggle-completion">${(completed ? "check_box":"check_box_outline_blank")}</span>
           <input class="note-input" type="text" placeholder="Type something..." value="${text}" size="1">
+          <span class="material-icons star">bookmark</span>
           <span class="material-icons delete">delete</span>
           <span class="material-icons">more_vert</span>
         </div>
       `)
     } else {
       $(".note-input:focus").parent(".note").after(`
-        <div class="note new ${animation?"add-animation"+(completed ? " completed":""):(completed ? "completed":"")}">
+        <div class="note new ${starred?"starred":""} ${animation?"add-animation"+(completed ? " completed":""):(completed ? "completed":"")}">
           <span class="material-icons drag">drag_indicator</span>
           <span class="material-icons toggle-completion">${(completed ? "check_box":"check_box_outline_blank")}</span>
           <input class="note-input" type="text" placeholder="Type something..." value="${text}" size="1">
+          <span class="material-icons star">bookmark</span>
           <span class="material-icons delete">delete</span>
           <span class="material-icons">more_vert</span>
         </div>
@@ -204,6 +213,15 @@ $(function(){
         } else {
             $(this).text("check_box_outline_blank");
         }
+        updateNotes();
+    });
+    $(".new").find(".star").on("click",function(e){
+        $(this).parent(".note").toggleClass("starred");
+        // if($(this).parent(".note").is(".starred")){
+        //     $(this).text("bookmark");
+        // } else {
+        //     $(this).text("bookmark_border");
+        // }
         updateNotes();
     });
     $(".new").find(".note-input").on("change keyup", function(e){
@@ -259,14 +277,37 @@ $(function(){
         console.log("raw:");
         console.log(e.completed);
         console.log("evaluated: "+e.completed == "true");
-      newNote(e.content, false, e.completed);
+        if(!e.hasOwnProperty("starred")){
+            e.starred = false;
+        }
+      newNote(e.content, false, e.completed, e.starred);
     });
   }
 
   function syncPreferences(){
-      console.log("Dark Mode: "+localStorage.getItem("darkMode"));
-      getDarkMode(localStorage.getItem("darkMode").trim() == "true");
-      darkMode = localStorage.getItem("darkMode").trim() == "true";
+      if(localStorage.getItem("customTheme") && localStorage.getItem("theme") === CUSTOM_MODE){
+          // const observer = new MutationObserver(function(mutationsList){
+          //     mutationsList.forEach(function(e){
+          //         if(e.type === "childList" && e.addedNodes){
+          //             console.log(e);
+          //
+          //         }
+          //     });
+          // });
+          $("head").append(`<style id="customMode" class="theme">${localStorage.getItem("customTheme")}</style>`);
+          setAllThemeProperties();
+          // observer.observe($("head")[0], {childList: true, subtree: true});
+      }else if(localStorage.getItem("theme") !== CUSTOM_MODE){
+          console.log("Custom Theme Overriding...");
+          addTheme(localStorage.getItem("theme"));
+      } else if(localStorage.getItem("darkMode")){
+          if(localStorage.getItem("darkMode").trim() == "true"){
+              addTheme(DARK_MODE);
+          }
+          localStorage.removeItem("darkMode");
+      } else {
+          addTheme(DEFAULT_MODE)
+      }
       // setTimeout(function(){$("#loading-background").hide();}, 50);
   }
 
@@ -286,7 +327,7 @@ $(function(){
   function updateNotes(){
     let data = [];
     $("#note-container").find(".note").each(function(){
-      data.push({content:$(this).find(".note-input").val(), completed:$(this).hasClass("completed")});
+      data.push({content:$(this).find(".note-input").val(), completed:$(this).hasClass("completed"), starred:$(this).hasClass("starred")});
     });
     globalData = JSON.stringify(data);
     localStorage.setItem("notes", globalData)
@@ -296,46 +337,195 @@ $(function(){
 
   }
 
+    //Thanks to Tim Down from https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    function componentToHex(c) {
+      var hex = c.toString(16);
+      return hex.length == 1 ? "0" + hex : hex;
+    }
+
+    function rgbToHex(r, g, b) {
+      return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+    }
 
   function addTheme(themeName){
-
+      $(".theme").remove();
+      localStorage.setItem("theme", themeName);
+      if(themeName !== CUSTOM_MODE && themeName !== DEFAULT_MODE && themeName !== LIGHT_MODE){
+          $("head").append(`<link id="${themeName}" rel="stylesheet" href="${themeName}.css" class="theme">`);
+          setTimeout(function(){
+             setAllThemeProperties();
+         }, 50);
+     } else if(themeName === CUSTOM_MODE){
+          customModeEnabled = true;
+          let shadowColor = hexToRgb($("#shadow-input").val());
+          $("head").append(`
+              <style id="customMode" class="theme">
+                :root{
+                    --text-color: ${$("#text-color-input").val()};
+                    --bg-color: ${$("#bg-color-input").val()};
+                    --fg-color: ${$("#fg-color-input").val()};
+                    --accent-color: ${$("#accent-color-input").val()};
+                    --accent-input-color: ${$("#input-accent-color-input").val()};
+                    --accent-text-color: ${$("#accent-text-color-input").val()};
+                    --accent-input-text-color: ${$("#input-accent-text-color-input").val()};
+                    --scrollbar: ${$("#scrollbar-input").val()};
+                    --scrolltrack: ${$("#scrolltrack-input").val()};
+                    --default-shadow-color: ${$("#toggle-shadow")[0].checked ? `rgba(${shadowColor.r}, ${shadowColor.g}, ${shadowColor.b}, 0.8)` : "transparent"} ;
+                    --default-light-shadow-color: ${$("#toggle-shadow")[0].checked ? `rgba(${shadowColor.r}, ${shadowColor.g}, ${shadowColor.b}, 0.5)` : "transparent"};
+                }
+              </style>
+          `);
+          localStorage.setItem("customTheme", $("#customMode").text());
+      } else if(themeName === DEFAULT_MODE){
+          //Thanks to Mark Szabo from https://stackoverflow.com/questions/56393880/how-do-i-detect-dark-mode-using-javascript
+          if(window.matchMedia){
+              if(window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                  addTheme(DARK_MODE);
+              } else if(window.matchMedia('(prefers-color-scheme: light)').matches){
+                  addTheme(LIGHT_MODE);
+              }
+          } else {
+              alert("Lol what type of browser are you using? Get Chrome here: https://www.google.com/chrome/ or Firefox here: https://www.mozilla.org/en-US/firefox/new/ ")
+          }
+      } else if(themeName === LIGHT_MODE){
+           setAllThemeProperties();
+      }
   }
 
-  function removeTheme(themeName){
+  $("#custom-theme-toggle").click(function(){
+      addTheme(CUSTOM_MODE);
+  });
 
-  }
+    // setAllThemeProperties();
+    //Set Default Color Values in Settings
+    function setAllThemeProperties(){
+        console.log("running");
+        $("#text-color-input").val(getComputedStyle(document.documentElement).getPropertyValue('--text-color').toLowerCase().trim());
+        $("#bg-color-input").val(getComputedStyle(document.documentElement).getPropertyValue('--bg-color').toLowerCase().trim());
+        $("#fg-color-input").val(getComputedStyle(document.documentElement).getPropertyValue('--fg-color').toLowerCase().trim());
+        $("#accent-color-input").val(getComputedStyle(document.documentElement).getPropertyValue('--accent-color').toLowerCase().trim());
+        $("#input-accent-color-input").val(getComputedStyle(document.documentElement).getPropertyValue('--accent-input-color').toLowerCase().trim());
+        $("#accent-text-color-input").val(getComputedStyle(document.documentElement).getPropertyValue('--accent-text-color').toLowerCase().trim());
+        $("#input-accent-text-color-input").val(getComputedStyle(document.documentElement).getPropertyValue('--accent-input-text-color').toLowerCase().trim());
+        $("#scrollbar-input").val(getComputedStyle(document.documentElement).getPropertyValue('--scrollbar').toLowerCase().trim());
+        $("#scrolltrack-input").val(getComputedStyle(document.documentElement).getPropertyValue('--scrolltrack').toLowerCase().trim());
+        let shadowColor = getComputedStyle(document.documentElement).getPropertyValue('--default-shadow-color');
+        console.log("Shadow Color: " +shadowColor.trim());
+        if(shadowColor.trim() !== "transparent"){
+            console.log("not transparent");
+            let shadowColorRed = shadowColor.slice(shadowColor.indexOf("(")+1, shadowColor.indexOf(",")).trim();
+            shadowColor = shadowColor.slice(shadowColor.indexOf(",") + 1, shadowColor.length);
+            let shadowColorGreen = shadowColor.slice(0, shadowColor.indexOf(",")).trim();
+            shadowColor = shadowColor.slice(shadowColor.indexOf(",") + 1, shadowColor.length);
+            let shadowColorBlue = shadowColor.slice(0, shadowColor.indexOf(",")).trim();
+            shadowColor = rgbToHex(Number(shadowColorRed), Number(shadowColorGreen), Number(shadowColorBlue));
+            $("#shadow-input").val(shadowColor);
+            $("#toggle-shadow")[0].checked = true;
+        } else {
+            $("#toggle-shadow")[0].checked = false;
+        }
+
+    }
+
+  // if(window.matchMedia){
+  //     if(window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  //         addTheme(DARK_MODE);
+  //     } else if(window.matchMedia('(prefers-color-scheme: light)').matches){
+  //         addTheme(LIGHT_MODE);
+  //     }
+  // } else {
+  //     alert("Lol what type of browser are you using? Get Chrome here: https://www.google.com/chrome/ or Firefox here: https://www.mozilla.org/en-US/firefox/new/ ")
+  // }
+  // $("#custom-theme-input").val()
+
+
 
   //Toggle Dark/Light Theme
-  $("#dark-theme-button").on("click", function(){
-      $("#dark-css").remove();
-      $("head").append(`<link id="dark-css" rel="stylesheet" href="dark.css">`);
-      darkMode = true;
-      localStorage.setItem("darkMode", darkMode);
+  $("#dark-theme-button, #dark-template").on("click", function(){
+      // $("#dark-css").remove();
+      // $("head").append(`<link id="dark-css" rel="stylesheet" href="dark.css">`);
+      // darkMode = true;
+      // localStorage.setItem("darkMode", darkMode);
+      addTheme(DARK_MODE);
   });
 
-  $("#light-theme-button").on("click", function(){
-      $("#dark-css").remove();
-      darkMode = false;
-      localStorage.setItem("darkMode", darkMode);
+  $("#light-theme-button, #light-template").on("click", function(){
+      addTheme(LIGHT_MODE);
   });
 
-//Thanks to Mark Szabo from https://stackoverflow.com/questions/56393880/how-do-i-detect-dark-mode-using-javascript
 $("#default-theme-button").on("click", function(){
-    if(window.matchMedia){
-        if(window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            $("#dark-css").remove();
-            $("head").append(`<link id="dark-css" rel="stylesheet" href="dark.css">`);
-            darkMode = true;
-            localStorage.setItem("darkMode", darkMode);
-        } else if(window.matchMedia('(prefers-color-scheme: light)').matches){
-            $("#dark-css").remove();
-            darkMode = false;
-            localStorage.setItem("darkMode", darkMode);
-        }
-    } else {
-        alert("Lol what type of browser are you using? Get Chrome here: https://www.google.com/chrome/ or Firefox here: https://www.mozilla.org/en-US/firefox/new/ ")
-    }
+    addTheme(DEFAULT_MODE);
 });
+
+$("#custom-theme-button").on("click", function(){
+    addTheme(CUSTOM_MODE);
+});
+
+$("#sunset-theme-button, #sunset-template").on("click", function(){
+    addTheme(SUNSET_MODE);
+});
+
+$("#aqua-theme-button, #aqua-template").on("click", function(){
+    addTheme(AQUA_MODE);
+});
+
+$("#background-img-input").on("change", function(){
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        console.log("image: "+e.target.result)
+      $("#background").css("background-image", `url(${e.target.result})`)
+    }
+    reader.readAsDataURL($(this)[0].files[0]);
+    // let tempURL = URL.createObjectURL($(this)[0].files[$(this)[0].files.length - 1]);
+    // console.log("change");
+    // console.log("img url: "+tempURL)
+
+});
+
+$("#opacity-input").on("change", function(){
+    // let hoverVal = ;
+        let opacity = Number($(this).val());
+        $("#bg-img-style").html(`
+            .ui-component{
+                opacity: ${opacity};
+            }
+            .note.completed{
+                opacity: ${opacity * 0.5} !important;
+            }
+            .note{
+                opacity: ${opacity} !important;
+            }
+            .note:hover{
+                opacity: ${(opacity + (1 - opacity) * 0.5)} !important;
+            }
+            .note:active{
+                opacity: 1 !important;
+            }
+            .modal .ui-component{
+                opacity: 1 !important;
+            }
+        `);
+});
+
+$("#blur-input").on("change", function(){
+    console.log($(this).val());
+    $("#background").css("filter", "blur("+$(this).val()+"px)")
+});
+
+
+$("#remove-bg-img").click(function(){
+    // $()
+});
+
 
   function getDarkMode(isDarkMode){
       $("#dark-css").remove();
