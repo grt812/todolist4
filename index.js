@@ -172,10 +172,10 @@ $(function(){
 
   $("#new-note").on("click", newNote);
   $("#new-item-button").on("click", function(){
-      newNote();
+      newNote("", true, false, false, true);
   });
 
-  function newNote(text="", animation=true, completed=false, starred = false){
+  function newNote(text="", animation=true, completed=false, starred = false, button=false){
     if(text.target){
       text="";
     }
@@ -251,7 +251,7 @@ $(function(){
       if(!titleDisplay){
           $("#new-item-button").stop().show(500);
       }
-      if(animation && $("#mobile").is(":hidden")){
+      if(animation && $("#mobile").is(":hidden") && button){
           window.scrollTo(0,document.body.scrollHeight);
       }
     }).click(function(){
